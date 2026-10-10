@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>SignalSense | Adaptive Traffic Intelligence</title>
+
+<style>
+:root {
+  --bg: #07111f;
+  --panel: #101d30;
+  --panel2: #13243a;
+  --line: #263b56;
+  --text: #eaf2ff;
+  --muted: #8fa6c3;
+  --cyan: #4ce4ef;
+  --green: #35e29a;
+  --amber: #ffc857;
+  --red: #ff5f70;
+  --purple: #ad8cff;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: radial-gradient(
+    ellipse at top,
+    #102542 0,
+    #07111f 58%
+  );
+  font-family: Inter, "Segoe UI", Arial, sans-serif;
+  color: var(--text);
+}
+
+button, input, select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+  border: 0;
+  border-radius: 10px;
+  padding: 11px 14px;
+  font-weight: 750;
+  transition: .18s;
+}
+
+button:hover {
+  filter: brightness(1.12);
+  transform: translateY(-1px);
+}
+
+button:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+
+.primary {
+  background: linear-gradient(135deg, #35dbe8, #49a6ff);
+  color: #041321;
+}
+
+.secondary {
+  background: #203651;
+  color: var(--text);
+  border: 1px solid #35516f;
+}
+
+.danger {
+  background: #502738;
+  color: #ffdce2;
+  border: 1px solid #874355;
+}
+
+.good {
+  background: #123e39;
+  color: #a8ffe0;
+  border: 1px solid #207c6a;
+}
+
+.wrap {
+  max-width: 1440px;
+  margin: auto;
+  padding: 22px;
+}
+
+.top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+}
+
+.logo {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(145deg, #35dbe8, #9d8bff);
+  color: #061323;
+  font-size: 23px;
+  font-weight: 900;
+  box-shadow: 0 8px 30px #4ce4ef33;
+}
+
+.eyebrow {
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: var(--cyan);
+  font-weight: 800;
+}
+
+.brand h1 {
+  font-size: 26px;
+  letter-spacing: -.8px;
+  margin: 3px 0;
+}
+
+.brand p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #b9cbe0;
+  font-size: 12px;
+  background: #102038;
+  border: 1px solid var(--line);
+  padding: 10px 13px;
+  border-radius: 99px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 10px var(--green);
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.panel {
+  background: linear-gradient(145deg, #112139ed, #0d1929f2);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 18px;
+  box-shadow: 0 15px 50px #0002;
+  min-width: 0;
+}
+
+.panel-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.panel h2 {
+  font-size: 15px;
+  margin: 0;
+}
+
+.sub {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.tag {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  padding: 6px 9px;
+  border-radius: 99px;
+  background: #163b4a;
+  color: var(--cyan);
+  border: 1px solid #28616b;
+}
+
+.tag.live {
+  background: #123e31;
+  color: #8df6c5;
+  border-color: #216a50;
+}
+
+.controls {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* Intersection animation */
+
+.intersection {
+  height: 290px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 14px;
+  background: linear-gradient(0deg, #172c3b, #203a45);
+  border: 1px solid #345168;
+}
+
+.intersection:before,
+.intersection:after {
+  content: "";
+  position: absolute;
+  background: #263747;
+}
+
+.intersection:before {
+  left: 33%;
+  width: 34%;
+  top: 0;
+  height: 100%;
+  border-left: 2px dashed #9ab1bd77;
+  border-right: 2px dashed #9ab1bd77;
+}
+
+.intersection:after {
+  top: 33%;
+  height: 34%;
+  left: 0;
+  width: 100%;
+  border-top: 2px dashed #9ab1bd77;
+  border-bottom: 2px dashed #9ab1bd77;
+}
+
+.road-label {
+  position: absolute;
+  z-index: 2;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: #d8e8ef;
+}
+
+.road-label.n {
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.road-label.s {
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.road-label.e {
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.road-label.w {
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.signal {
+  position: absolute;
+  z-index: 4;
+  width: 28px;
+  height: 70px;
+  border-radius: 9px;
+  background: #07101b;
+  border: 2px solid #456078;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-evenly;
+}
+
+.signal i {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #243443;
+  border: 1px solid #526475;
+}
+
+.signal .red.on {
+  background: var(--red);
+  box-shadow: 0 0 12px #ff5f70aa;
+}
+
+.signal .yellow.on {
+  background: var(--amber);
+  box-shadow: 0 0 12px #ffc857aa;
+}
+
+.signal .green.on {
+  background: var(--green);
+  box-shadow: 0 0 12px #35e29aaa;
+}
+
+.sig-n {
+  top: 22%;
+  left: calc(50% - 45px);
+}
+
+.sig-s {
+  bottom: 22%;
+  left: calc(50% + 17px);
+}
+
+.sig-e {
+  right: 22%;
+  top: calc(50% - 45px);
+}
+
+.sig-w {
+  left: 22%;
+  top: calc(50% + 17px);
+}
+
+/* Moving vehicles */
+
+.car {
+  position: absolute;
+  z-index: 3;
+  width: 11px;
+  height: 20px;
+  border-radius: 4px;
+  background: #65d7ff;
+  border: 1px solid #e5faff;
+  box-shadow: 0 0 8px #4ce4ef88;
+  animation: drive 2.2s linear infinite;
+}
+
+.car.c2 {
+  background: #ffca65;
+  animation-delay: -.8s;
+}
+
+.car.c3 {
+  background: #b89aff;
+  animation-delay: -1.5s;
+}
+
+@keyframes drive {
+  0% {
+    transform: translateY(-24px);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(34px);
+    opacity: 0;
+  }
+}
+
+.routebar {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.routechip {
+  font-size: 11px;
+  background: #0a1727;
+  border: 1px solid #2b4058;
+  border-radius: 9px;
+  padding: 8px 10px;
+  color: #b9cbe0;
+}
+
+.routechip b {
+  color: var(--text);
+}
+
+/* Dashboard metrics */
+
+.side-stack {
+  display: grid;
+  gap: 16px;
+  align-content: start;
+}
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 9px;
+}
+
+.metric {
+  padding: 12px;
+  background: #0a1727;
+  border: 1px solid #263c55;
+  border-radius: 12px;
+}
+
+.metric label {
+  display: block;
+  font-size: 10px;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.metric strong {
+  font-size: 23px;
+}
+
+.metric small {
+  font-size: 10px;
+  color: var(--green);
+  display: block;
+  margin-top: 4px;
+}
+
+.barrow {
+  display: grid;
+  grid-template-columns: 46px 1fr 38px;
+  align-items: center;
+  gap: 9px;
+  margin: 13px 0;
+  font-size: 12px;
+}
+
+.bar {
+  height: 8px;
+  background: #22344a;
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.bar span {
+  height: 100%;
+  display: block;
+  border-radius: 99px;
+  background: linear-gradient(90deg, #36dbe8, #658cff);
+  transition: width .35s;
+}
+
+.barrow strong {
+  text-align: right;
+  font-size: 12px;
+}
+
+.grid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* Direction controls */
+
+.direction-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.direction {
+  background: #0a1727;
+  border: 1px solid #263c55;
+  border-radius: 12px;
+  padding: 13px;
+}
+
+.direction-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.direction-head b {
+  font-size: 13px;
+}
+
+.mini-status {
+  font-size: 9px;
+  padding: 4px 6px;
+  border-radius: 99px;
+  background: #233346;
+  color: #b7c8d9;
+}
+
+.mini-status.active {
+  background: #104d3c;
+  color: #8effc9;
+}
+
+.range {
+  width: 100%;
+  accent-color: var(--cyan);
+}
+
+/* Emergency input and event log */
+
+.emergency-row {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr 1fr auto;
+  gap: 8px;
+  align-items: end;
+  margin-top: 12px;
+}
+
+.field label {
+  display: block;
+  font-size: 10px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.field input,
+.field select {
+  width: 100%;
+  padding: 10px;
+  background: #081522;
+  border: 1px solid #31475e;
+  border-radius: 9px;
+  color: var(--text);
+}
+
+.field input:focus,
+.field select:focus {
+  border-color: var(--cyan);
+  outline: none;
+}
+
+.emergency-list {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.em-card {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  padding: 11px;
+  border-radius: 11px;
+  background: #271d2c;
+  border: 1px solid #624055;
+}
+
+.em-card strong {
+  font-size: 12px;
+}
+
+.em-card small {
+  display: block;
+  color: #c7afc4;
+  margin-top: 4px;
+  font-size: 10px;
+}
+
+.em-card .priority {
+  font-size: 10px;
+  color: #ffd6a0;
+  text-align: right;
+}
+
+.log {
+  height: 178px;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.logitem {
+  border-left: 2px solid var(--cyan);
+  padding: 7px 9px;
+  background: #0a1727;
+  border-radius: 0 8px 8px 0;
+  font-size: 11px;
+  color: #c5d4e7;
+}
+
+.logitem time {
+  color: var(--cyan);
+  font-weight: 800;
+  margin-right: 8px;
+}
+
+.logitem.warn {
+  border-color: var(--amber);
+}
+
+.logitem.alert {
+  border-color: var(--red);
+}
+
+/* Camera preview */
+
+.camera-box {
+  position: relative;
+  background: #050b12;
+  border: 1px solid #263c55;
+  border-radius: 12px;
+  overflow: hidden;
+  min-height: 210px;
+  display: grid;
+  place-items: center;
+}
+
+.camera-box video {
+  width: 100%;
+  max-height: 300px;
+  object-fit: contain;
+  display: block;
+}
+
+.camera-placeholder {
+  text-align: center;
+  padding: 24px;
+  color: var(--muted);
+}
+
+.camera-placeholder strong {
+  display: block;
+  color: var(--text);
+  font-size: 14px;
+  margin: 10px 0;
+}
+
+.camera-placeholder span {
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.cam-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border: 1px solid #4ce4ef22;
+}
+
+.cam-overlay:after {
+  content: "DETECTION INPUT • NOT ANALYSED UNTIL MODEL LOADS";
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  background: #06101bcc;
+  color: var(--cyan);
+  font-size: 9px;
+  letter-spacing: 1px;
+  padding: 6px 8px;
+  border-radius: 5px;
+}
+
+.notice {
+  font-size: 11px;
+  line-height: 1.55;
+  color: #a9bfd8;
+  background: #0a1727;
+  border: 1px solid #263c55;
+  border-radius: 10px;
+  padding: 11px;
+  margin-top: 12px;
+}
+
+.notice strong {
+  color: #fff;
+}
+
+.footer {
+  text-align: center;
+  color: #637e9d;
+  font-size: 10px;
+  padding: 20px 0 5px;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.timer {
+  font-variant-numeric: tabular-nums;
+  color: var(--cyan);
+  font-weight: 900;
+}
+
+.priority-explain {
+  font-size: 11px;
+  line-height: 1.55;
+  color: #b7c9de;
+  margin-top: 10px;
+}
+
+.conflict {
+  color: #ffbdc6;
+}
+
+.safe {
+  color: #8effc9;
+}
+
+/* Responsive design */
+
+@media (max-width: 950px) {
+  .hero,
+  .grid2 {
+    grid-template-columns: 1fr;
+  }
+
+  .emergency-row {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .emergency-row button {
+    grid-column: span 2;
+  }
+
+  .intersection {
+    height: 260px;
+  }
+}
+
+@media (max-width: 540px) {
+  .wrap {
+    padding: 12px;
+  }
+
+  .brand h1 {
+    font-size: 21px;
+  }
+
+  .panel {
+    padding: 13px;
+  }
+
+  .metrics {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .metrics .metric:last-child {
+    grid-column: span 2;
+  }
+
+  .direction-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .emergency-row {
+    grid-template-columns: 1fr;
+  }
+
+  .emergency-row button {
+    grid-column: auto;
+  }
+
+  .intersection {
+    height: 235px;
+  }
+}
+</style>
+</head>
+
+<body>
+<div class="wrap">
+
+<header class="top">
+  <div class="brand">
+    <div class="logo">S</div>
+    <div>
+      <div class="eyebrow">ADAPTIVE TRAFFIC INTELLIGENCE</div>
+      <h1>SignalSense <span style="color:var(--cyan)">/</span> Control Centre</h1>
+      <p>Computer vision concept • Adaptive phase planner • Emergency coordination</p>
+    </div>
+  </div>
+
+  <div class="status">
+    <span class="dot"></span>
+    <span id="systemStatus">SIMULATION READY</span>
+    <span style="color:#49627f">|</span>
+    <span id="clock">00:00</span>
+  </div>
+</header>
+
+<!-- Live intersection dashboard -->
+
+<section class="hero">
+
+  <div class="panel">
+    <div class="panel-head">
+      <div>
+        <h2>Live Intersection View</h2>
+        <div class="sub" style="margin-top:5px">
+          Four-way junction • Safe phase sequencing
+        </div>
+      </div>
+      <span class="tag" id="phaseTag">ALL RED · READY</span>
+    </div>
+
+    <div class="intersection" id="intersection">
+      <span class="road-label n">NORTH ↑</span>
+      <span class="road-label s">SOUTH ↓</span>
+      <span class="road-label e">EAST →</span>
+      <span class="road-label w">WEST ←</span>
+
+      <div class="signal sig-n" id="sigN">
+        <i class="red on"></i><i class="yellow"></i><i class="green"></i>
+      </div>
+
+      <div class="signal sig-s" id="sigS">
+        <i class="red on"></i><i class="yellow"></i><i class="green"></i>
+      </div>
+
+      <div class="signal sig-e" id="sigE">
+        <i class="red on"></i><i class="yellow"></i><i class="green"></i>
+      </div>
+
+      <div class="signal sig-w" id="sigW">
+        <i class="red on"></i><i class="yellow"></i><i class="green"></i>
+      </div>
+
+      <div id="cars"></div>
+    </div>
+
+    <div class="routebar">
+      <div class="routechip">Active phase: <b id="activePhase">—</b></div>
+      <div class="routechip">Next phase: <b id="nextPhase">Awaiting start</b></div>
+      <div class="routechip">Green timer: <b class="timer" id="greenTimer">—</b></div>
+    </div>
+
+    <div class="controls" style="margin-top:15px">
+      <button class="primary" id="runBtn">▶ Run 10-sec Demo</button>
+      <button class="secondary" id="pauseBtn" disabled>Ⅱ Pause</button>
+      <button class="danger" id="resetBtn">↻ Reset</button>
+    </div>
+  </div>
+
+  <div class="side-stack">
+
+    <div class="panel">
+      <div class="panel-head">
+        <h2>Traffic Summary</h2>
+        <span class="tag">LIVE SIMULATION</span>
+      </div>
+
+      <div class="metrics">
+        <div class="metric">
+          <label>Total Vehicles</label>
+          <strong id="totalVehicles">63</strong>
+          <small>Across 4 approaches</small>
+        </div>
+
+        <div class="metric">
+          <label>Emergency Requests</label>
+          <strong id="emCount">0</strong>
+          <small id="emSub">No active request</small>
+        </div>
+
+        <div class="metric">
+          <label>Average Waiting</label>
+          <strong id="avgWait">20s</strong>
+          <small>Simulated estimate</small>
+        </div>
+      </div>
+
+      <div style="margin-top:18px">
+        <div class="sub">Vehicle count by direction</div>
+
+        <div class="barrow">
+          <span>North</span>
+          <div class="bar"><span id="barN" style="width:40%"></span></div>
+          <strong id="countN">25</strong>
+        </div>
+
+        <div class="barrow">
+          <span>South</span>
+          <div class="bar"><span id="barS" style="width:20%"></span></div>
+          <strong id="countS">12</strong>
+        </div>
+
+        <div class="barrow">
+          <span>East</span>
+          <div class="bar"><span id="barE" style="width:15%"></span></div>
+          <strong id="countE">8</strong>
+        </div>
+
+        <div class="barrow">
+          <span>West</span>
+          <div class="bar"><span id="barW" style="width:30%"></span></div>
+          <strong id="countW">18</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <h2>Decision Engine</h2>
+        <span class="tag live">ADAPTIVE LOGIC</span>
+      </div>
+
+      <div class="notice" id="decisionBox">
+        Waiting for the simulation to start.
+      </div>
+
+      <div class="routebar">
+        <div class="routechip">
+          Recommended approach: <b id="recommendedRoad">North</b>
+        </div>
+        <div class="routechip">
+          Green duration: <b id="recommendedTime">25s</b>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- Vehicle counts and adaptive traffic timing -->
+
+<section class="grid2">
+
+  <div class="panel">
+    <div class="panel-head">
+      <div>
+        <h2>Traffic Inputs</h2>
+        <div class="sub">Adjust simulated vehicle counts for each direction</div>
+      </div>
+      <span class="tag">MANUAL / SIMULATED</span>
+    </div>
+
+    <div class="direction-grid">
+
+      <div class="direction">
+        <div class="direction-head">
+          <b>North Approach</b>
+          <span class="mini-status" id="statusN">Waiting</span>
+        </div>
+        <div class="countline">
+          <span>Vehicle count</span>
+          <strong id="valN">25</strong>
+        </div>
+        <input class="range" id="inputN" type="range" min="0" max="60" value="25">
+        <div class="countline" style="margin-top:9px">
+          <span>Waiting time</span><strong id="waitN">28s</strong>
+        </div>
+      </div>
+
+      <div class="direction">
+        <div class="direction-head">
+          <b>South Approach</b>
+          <span class="mini-status" id="statusS">Waiting</span>
+        </div>
+        <div class="countline">
+          <span>Vehicle count</span>
+          <strong id="valS">12</strong>
+        </div>
+        <input class="range" id="inputS" type="range" min="0" max="60" value="12">
+        <div class="countline" style="margin-top:9px">
+          <span>Waiting time</span><strong id="waitS">17s</strong>
+        </div>
+      </div>
+
+      <div class="direction">
+        <div class="direction-head">
+          <b>East Approach</b>
+          <span class="mini-status" id="statusE">Waiting</span>
+        </div>
+        <div class="countline">
+          <span>Vehicle count</span>
+          <strong id="valE">8</strong>
+        </div>
+        <input class="range" id="inputE" type="range" min="0" max="60" value="8">
+        <div class="countline" style="margin-top:9px">
+          <span>Waiting time</span><strong id="waitE">12s</strong>
+        </div>
+      </div>
+
+      <div class="direction">
+        <div class="direction-head">
+          <b>West Approach</b>
+          <span class="mini-status" id="statusW">Waiting</span>
+        </div>
+        <div class="countline">
+          <span>Vehicle count</span>
+          <strong id="valW">18</strong>
+        </div>
+        <input class="range" id="inputW" type="range" min="0" max="60" value="18">
+        <div class="countline" style="margin-top:9px">
+          <span>Waiting time</span><strong id="waitW">22s</strong>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="notice">
+      <strong>How the demo decides:</strong>
+      vehicle count and waiting time contribute to a score.
+      The highest-scoring eligible approach is selected, with a
+      maximum green duration and a minimum waiting-time safeguard.
+    </div>
+  </div>
+
+  <!-- Emergency coordination -->
+
+  <div class="panel">
+    <div class="panel-head">
+      <div>
+        <h2>Emergency Priority Queue</h2>
+        <div class="sub">Test multiple emergency vehicles approaching from different roads</div>
+      </div>
+      <span class="tag">CONFLICT-AWARE</span>
+    </div>
+
+    <div class="emergency-row">
+      <div class="field">
+        <label for="emDir">Approach direction</label>
+        <select id="emDir">
+          <option value="N">North</option>
+          <option value="S">South</option>
+          <option value="E">East</option>
+          <option value="W">West</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="emType">Vehicle type</label>
+        <select id="emType">
+          <option value="ambulance">Ambulance</option>
+          <option value="fire">Fire truck</option>
+          <option value="police">Police</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="emEta">ETA (seconds)</label>
+        <input id="emEta" type="number" min="1" max="300" value="12">
+      </div>
+
+      <button class="primary" id="addEm">+ Add</button>
+    </div>
+
+    <div class="controls" style="margin-top:10px">
+      <button class="secondary" id="testTwo">Test 2 emergencies</button>
